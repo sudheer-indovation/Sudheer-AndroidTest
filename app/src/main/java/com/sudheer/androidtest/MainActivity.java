@@ -31,20 +31,20 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    LinearLayoutManager layoutManager;
-    TextView txtCount;
-    ProgressBar progressBar;
-    ArrayList<DataListModel> list = new ArrayList<DataListModel>();
-    RecyclerAdapter adapter;
-    boolean isLoadingData = false;
-    int nPages = 20;
+    private RecyclerView recyclerView;
+    private LinearLayoutManager layoutManager;
+    private TextView txtCount;
+    private ProgressBar progressBar;
+    private ArrayList<DataListModel> list = new ArrayList<DataListModel>();
+    private RecyclerAdapter adapter;
+    private boolean isLoadingData = false;
+    private int hitsPerPage = 20;
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         setUpToolbar();
         initViews();
 
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 int totalItemCount = recyclerView.getLayoutManager().getItemCount();
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                 if (!isLoadingData && totalItemCount == lastVisibleItemPosition + 1) {
-                    getData((list.size() / nPages) + 1);
+                    getData((list.size() / hitsPerPage) + 1);
                 }
             }
 
@@ -107,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 try {
                     DataModel dataModel = new Gson().fromJson(response, DataModel.class);
+                    hitsPerPage = dataModel.hitsPerPage;
                     list.addAll(dataModel.hits);
                     txtCount.setText("" + list.size());
                     adapter.notifyDataSetChanged();
