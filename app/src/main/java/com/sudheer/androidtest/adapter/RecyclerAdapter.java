@@ -16,8 +16,8 @@ import java.util.ArrayList;
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
-    ArrayList<DataListModel> mList;
-    Context mContext;
+    private ArrayList<DataListModel> mList;
+    private Context mContext;
 
     public RecyclerAdapter(Context context, ArrayList<DataListModel> list) {
         mList = list;
