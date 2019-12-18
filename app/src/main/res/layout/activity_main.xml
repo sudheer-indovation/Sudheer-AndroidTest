@@ -23,7 +23,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginLeft="10dp"
                 android:text="@string/app_name"
                 android:textColor="#fff"
                 android:textSize="18sp"
@@ -46,6 +45,7 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/progressBar"
         android:layout_below="@+id/toolbar"
         tools:context=".MainActivity"></androidx.recyclerview.widget.RecyclerView>
 

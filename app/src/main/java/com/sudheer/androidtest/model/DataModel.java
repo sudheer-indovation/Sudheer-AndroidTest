@@ -1,4 +1,4 @@
-package com.sudheer.androidtest;
+package com.sudheer.androidtest.model;
 
 import java.util.ArrayList;
 

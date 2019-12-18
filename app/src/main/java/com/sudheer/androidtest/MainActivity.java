@@ -9,8 +9,10 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.sudheer.androidtest.adapter.RecyclerAdapter;
+import com.sudheer.androidtest.model.DataListModel;
+import com.sudheer.androidtest.model.DataModel;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -19,15 +21,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -47,20 +45,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        txtCount = (TextView) toolbar.findViewById(R.id.txtCount);
-        toolbar.setTitle("Test");
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        setUpToolbar();
+        initViews();
+
+        //set Adapter
         adapter = new RecyclerAdapter(this, list);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+        //add ScrollListener
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
+
+                //get next page data
                 int totalItemCount = recyclerView.getLayoutManager().getItemCount();
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                 if (!isLoadingData && totalItemCount == lastVisibleItemPosition + 1) {
@@ -73,9 +71,27 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+
+        //call api for Data
         getData(1);
     }
 
+    //set Toolbar items
+    private void setUpToolbar() {
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        txtCount = (TextView) toolbar.findViewById(R.id.txtCount);
+    }
+
+    //initViews
+    private void initViews() {
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+    }
+
+    //Get Data from server
     private void getData(final int pageNumber) {
         isLoadingData = true;
         progressBar.setVisibility(View.VISIBLE);
@@ -90,16 +106,8 @@ public class MainActivity extends AppCompatActivity {
                 isLoadingData = false;
                 progressBar.setVisibility(View.GONE);
                 try {
-                    JSONObject data = new JSONObject(response);
-                    nPages = data.getInt("hitsPerPage");
-                    JSONArray array = data.getJSONArray("hits");
-                    for (int i = 0; i < array.length(); i++) {
-                        DataListModel dataListModel = new DataListModel();
-                        JSONObject itemData = new JSONObject(array.get(i).toString());
-                        dataListModel.created_at = itemData.getString("created_at");
-                        dataListModel.title = itemData.getString("title");
-                        list.add(dataListModel);
-                    }
+                    DataModel dataModel = new Gson().fromJson(response, DataModel.class);
+                    list.addAll(dataModel.hits);
                     txtCount.setText("" + list.size());
                     adapter.notifyDataSetChanged();
                 } catch (Exception e) {
@@ -116,27 +124,5 @@ public class MainActivity extends AppCompatActivity {
 
 // Add the request to the RequestQueue.
         queue.add(stringRequest);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 }

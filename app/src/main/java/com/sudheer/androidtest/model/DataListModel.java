@@ -1,4 +1,4 @@
-package com.sudheer.androidtest;
+package com.sudheer.androidtest.model;
 
 public class DataListModel {
     public String title="";
